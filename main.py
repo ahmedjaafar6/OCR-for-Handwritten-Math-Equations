@@ -4,15 +4,13 @@ from matplotlib import pyplot as plt
 import numpy as np
 import utils
 
-def find_good_contours_thres(conts, alpha = 0.002):
+def find_good_contours_thres(img, conts, alpha = 0.005):
     '''+  
     Function to find threshold of good contours on basis of 10% of maximum area
     Input: Contours, threshold for removing noises
     Output: Contour area threshold
     
-    For image dim 3307*4676
-    alpha(text_segment) = 0.01
-    alpha(extract_line) = 0.002
+    For image dim img.shape
     '''
     #Calculating areas of contours and appending them to a list
     areas = []
@@ -64,29 +62,27 @@ def Parser(img, alpha, show=True):
     dilation = cv2.dilate(img,kernel,iterations = 2)
     erosion = cv2.erode(dilation,kernel,iterations = 1)
 
-    # Convert to grayscale
-    erosion = cv2.cvtColor(erosion, cv2.COLOR_BGR2GRAY).astype(np.uint8)
+    (thresh, erosion) = cv2.threshold(erosion, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
-    plt.imshow(erosion)
-    plt.show()
-    
     # Find the contours
     if(cv2.__version__ == '3.3.1'):
-        xyz, contours, hierarchy = cv2.findContours(erosion,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        xyz, contours, hierarchy = cv2.findContours(erosion,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     else:
-        contours, hierarchy = cv2.findContours(erosion,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-        
+        contours, hierarchy = cv2.findContours(erosion,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+
+    # print(contours)
+    
     #Find a contour threshold for this dataset (hyperparam!)
-    contour_threshold = find_good_contours_thres(contours, alpha)
+    contour_threshold = find_good_contours_thres(erosion, contours, alpha=alpha)
+    print(contour_threshold)
     contours = []
     for c in contours:       
         if( cv2.contourArea(c)**2 > contour_threshold):
             contours.append(c)
-    
+        
     #Retrieved bounding boxes
     contours_sorted, bounding_boxes = sort_contours(contours,method="left-to-right")
 
-    
     if(show == True):        
         plt.figure(figsize=(15,8))    
         plt.axis("on")
@@ -108,7 +104,7 @@ if __name__ == "__main__":
         img = i
         break
 
-    images = Parser(img, 0.05)
+    images = Parser(img, 0.005)
 
     for im in images:
         plt.imshow(im, cmap="gray")

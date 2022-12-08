@@ -48,7 +48,7 @@ def open_image(path):
 
 
 def get_aida_batch(batch_id):
-    """AIDA batch getter
+    """AIDA batch getter, returns grayscale images as a generator
 
     Args:
         batch_id (int): batch id, the batch id is the number in the folder name
@@ -61,7 +61,8 @@ def get_aida_batch(batch_id):
     for img_name in img_names:
         img_path = os.path.join(path,img_name)
         img = open_image(img_path)
-        yield img
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.uint8)
+        yield img_gray
         
 def get_handwritten_batch(batch_size):
     """Gets a batch of handwritten images and their symbols
