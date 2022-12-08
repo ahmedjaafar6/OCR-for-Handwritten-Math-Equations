@@ -6,77 +6,70 @@ class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
 
-        # fork11 = Convolution2D(nb_filters_1, nb_conv_init, nb_conv_init,  activation="relu", border_mode='same')(init)
-        # fork12 = Convolution2D(nb_filters_1, nb_conv_init, nb_conv_init, activation="relu", border_mode='same')(init)
-        # merge1 = concatenate([fork11, fork12], axis=1, name='merge1')
-        # # concat_feat = concatenate([concat_feat, x], mode='concat', axis=concat_axis, name='concat_'+str(stage)+'_'+str(branch))
-        # maxpool1 = MaxPooling2D(strides=(2,2), border_mode='same')(merge1)
-
-        # fork21 = Convolution2D(nb_filters_2, nb_conv_mid, nb_conv_mid, activation="relu", border_mode='same')(maxpool1)
-        # fork22 = Convolution2D(nb_filters_2, nb_conv_mid, nb_conv_mid, activation="relu", border_mode='same')(maxpool1)
-        # merge2 = concatenate([fork21, fork22, ], axis=1, name='merge2')
-        # maxpool2 = MaxPooling2D(strides=(2,2), border_mode='same')(merge2)
-
-        # fork31 = Convolution2D(nb_filters_3, nb_conv, nb_conv, activation="relu", border_mode='same')(maxpool2)
-        # fork32 = Convolution2D(nb_filters_3, nb_conv, nb_conv, activation="relu", border_mode='same')(maxpool2)
-        # fork33 = Convolution2D(nb_filters_3, nb_conv, nb_conv, activation="relu", border_mode='same')(maxpool2)
-        # fork34 = Convolution2D(nb_filters_3, nb_conv, nb_conv, activation="relu", border_mode='same')(maxpool2)
-        # fork35 = Convolution2D(nb_filters_3, nb_conv, nb_conv, activation="relu", border_mode='same')(maxpool2)
-        # fork36 = Convolution2D(nb_filters_3, nb_conv, nb_conv, activation="relu", border_mode='same')(maxpool2)
-        # merge3 = concatenate([fork31, fork32, fork33, fork34, fork35, fork36, ], axis=1, name='merge3')
-        # maxpool3 = MaxPooling2D(strides=(2,2), border_mode='same')(merge3)
-
-        self.fork1_1 = nn.Sequential(
+        # Convolutional layers
+        self.fork1 = nn.Sequential(
             nn.Conv2d(in_channels=1,
                       out_channels=64,
                       kernel_size=5,
                       stride=1,
-                      padding=2
+                      padding='same'
                       ),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.BatchNorm2d(64)
         )
 
-        self.fork1_2 = nn.Sequential(
-            nn.Conv2d(in_channels=1,
-                      out_channels=64,
-                      kernel_size=5,
+        self.fork2 = nn.Sequential(
+            nn.Conv2d(in_channels=64,
+                      out_channels=128,
+                      kernel_size=4,
                       stride=1,
-                      padding=2
+                      padding='same'
                       ),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.BatchNorm2d(128)
         )
 
-        self.maxpool = nn.MaxPool2d(kernel_size=2)
-      
+        self.fork3 = nn.Sequential(
+            nn.Conv2d(in_channels=128,
+                      out_channels=256,
+                      kernel_size=3,
+                      stride=1,
+                      padding='same'
+                      ),
+            nn.ReLU(),
+            nn.BatchNorm2d(256)
+        )
 
-            
-            # nn.Conv2d(in_channels=1,
-            #           out_channels=64,
-            #           kernel_size=5,
-            #           stride=1,
-            #           padding=2
-            #           ),
-            # nn.ReLU(),
-            # # merge
-            # torch.cat
+        self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2, padding='same')
 
+        self.dropout = nn.Dropout(p=0.5)
 
-
-
-        # )
         # Fully connected layer
-        # self.out = nn.Linear(1080, 10)
+        self.out = nn.Sequential(
+                nn.Linear(1080, 10),  # fix dims later
+                nn.Softmax()
+        )
 
-    def forward(self, x):
-        # x = self.conv1(x)
-        # # flatten the output of conv2 to (batch_size, 16*14*14)
-        # x = x.view(x.size(0), -1)
-        # output = self.out(x)
-        # return output
-        
-        x1 = self.fork1_1(x)
-        x2 = self.fork1_2(x)
-        x = torch.cat((x1, x2), 1)
-        x = self.maxpool(x)
 
-      
+    def forward(self, batch):
+        x1=self.fork1(batch)
+        x2=self.fork1(batch)
+        layer1=torch.cat((x1, x2), dim=1)
+        layer1=self.maxpool(layer1)
+        x1=self.fork2(layer1)
+        x2=self.fork2(layer1)
+        layer2=torch.cat((x1, x2), dim=1)
+        layer2=self.maxpool(layer2)
+        x1=self.fork3(layer2)
+        x2=self.fork3(layer2)
+        x3=self.fork3(layer2)
+        x4=self.fork3(layer2)
+        x5=self.fork3(layer2)
+        x6=self.fork3(layer2)
+        layer3=torch.cat((x1, x2, x3, x4, x5, x6), dim=1)
+        layer3=self.maxpool(layer3)
+
+        layer3=layer3.view(layer3.size(0), -1)  # maybe not needed
+        dropout=self.dropout(layer3)
+        output=self.out(dropout)
+        return output
