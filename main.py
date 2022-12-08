@@ -1,6 +1,8 @@
 # Main file for project
 import cv2
 from matplotlib import pyplot as plt
+import numpy as np
+import utils
 
 def find_good_contours_thres(conts, alpha = 0.002):
     '''+  
@@ -54,9 +56,7 @@ def sort_contours(contours, method="left-to-right"):
     # return the list of sorted contours and bounding boxes
     return (contours, boundingBoxes)
 
-def Parser(img, alpha): 
-
-    L_H = img.shape[0]
+def Parser(img, alpha, show=True): 
 
     ## apply some dilation and erosion to join the gaps - turn thick contours into lines
     #Selecting elliptical element for dilation    
@@ -64,6 +64,12 @@ def Parser(img, alpha):
     dilation = cv2.dilate(img,kernel,iterations = 2)
     erosion = cv2.erode(dilation,kernel,iterations = 1)
 
+    # Convert to grayscale
+    erosion = cv2.cvtColor(erosion, cv2.COLOR_BGR2GRAY).astype(np.uint8)
+
+    plt.imshow(erosion)
+    plt.show()
+    
     # Find the contours
     if(cv2.__version__ == '3.3.1'):
         xyz, contours, hierarchy = cv2.findContours(erosion,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
@@ -79,48 +85,7 @@ def Parser(img, alpha):
     
     #Retrieved bounding boxes
     contours_sorted, bounding_boxes = sort_contours(contours,method="left-to-right")
-    
-    char_locs = []
 
-    # Convert to grayscale
-    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-    
-    # 
-    i = 0
-    char_type =[]
-    while i in range(0, len(contours_sorted)):
-    
-        x,y,w,h = bounding_boxes[i]
-        exp = 0
-        if i+1 != len(contours_sorted):
-            x1,y1,w1,h1 = bounding_boxes[i+1]
-            if abs(x-x1) < 10 and  (h1+h) < 70:
-                #print(h+h1)
-                minX = min(x,x1)
-                minY = min(y,y1)
-                maxX = max(x+w, x1+w1)
-                maxY = max(y+h, y1+h1)
-                x,y,x11,y11 = minX, minY, maxX, maxY
-                
-                x,y,w,h = x,y,x11-x,y11-y
-                i = i+2
-                continue
-        
-        #char_locs.append([x,y,x+w,y+h])     
-        if(h<0.10*L_H and w<0.10*L_H):
-            #print('Yes')
-            i=i+1
-            continue
-
-        char_locs.append([x-2,y+Y1-2,x+w+1,y+h+Y1+1,w*h]) #Normalised location of char w.r.t box image
-        
-        cv2.rectangle(img,(x,y),(x+w,y+h),(153,180,255),2)
-        if i!=0:
-            if y+h < (L_H*(1/2)) and y < bounding_boxes[i-1][1] and h < bounding_boxes[i-1][3]:
-                exp = 1
-                cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
-        i = i+1
-        char_type.append(exp)
     
     if(show == True):        
         plt.figure(figsize=(15,8))    
@@ -128,19 +93,24 @@ def Parser(img, alpha):
         plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         plt.show()
 
-    df_char = pd.DataFrame(char_locs)
-    df_char.columns=['X1','Y1','X2','Y2','area']
-    df_char['exp'] = char_type
-    df_char['pred'] = df_char.apply(lambda c: predict(dict_clean[box_num],c['X1'],\
-           c['Y1'],c['X2'], c['Y2'], acc_thresh=acc_thresh), axis=1 )
-    df_char['pred_proba'] = df_char.apply(lambda c: predict(dict_clean[box_num],c['X1'],\
-           c['Y1'],c['X2'], c['Y2'], proba=True, acc_thresh=acc_thresh), axis=1 )
-    df_char['line_name'] = line_name
-    df_char['box_num'] = box_num
-    return [box_num,line_name,df_char]
-    pass
+    extracted_symbols = []
+    for i, box in enumerate(bounding_boxes):
+        x, y, l, h = box
+        extracted_symbols.append(img[y : y + h, x : x + l])
 
-
+    return extracted_symbols
 
 if __name__ == "__main__":
-    exit()
+    img = utils.get_aida_batch(1)
+    for i in img:
+        plt.imshow(i)
+        plt.show()
+        img = i
+        break
+
+    images = Parser(img, 0.05)
+
+    for im in images:
+        plt.imshow(im, cmap="gray")
+        plt.show()
+

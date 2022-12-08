@@ -22,3 +22,5 @@
 ### Reference Links:
 - Towards Data Science Article
     - https://towardsdatascience.com/computer-vision-auto-grading-handwritten-mathematical-answersheets-8974744f72dd
+- Code from artical
+    - https://github.com/divyaprabha123/Autograding-handwritten-mathematical-worksheets/blob/d074738c2e1db6b4619e9930f576439b309d1f37/utils_functions.py#L636-L725
