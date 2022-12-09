@@ -3,3 +3,4 @@ aida dataset
 handwritten_math
 *.zip
 __pycache__
+datasets

@@ -19,6 +19,8 @@
     - https://www.kaggle.com/datasets/aidapearson/ocr-data
 - MNIST Dataset:
     - http://yann.lecun.com/exdb/mnist/
+    - https://www.kaggle.com/datasets/hojjatk/mnist-dataset 
+      - Had to use above kaggle link (other link required login)
 
 ### Reference Links:
 - Towards Data Science Article

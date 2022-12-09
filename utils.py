@@ -5,34 +5,25 @@
 import cv2
 import os
 import numpy as np
-from enum import Enum
 
-class SYMBOLS(Enum):
-    COMMA = 0
-    EXCLAMATION = 1
-    PLUS = 2
-    MINUS = 3
-    LPAREN = 4
-    RPAREN = 5
-    ZERO = 6
-    
-def get_symbol_from_string(s):
-    if s == ',':
-        return SYMBOLS.COMMA
-    elif s == '!':
-        return SYMBOLS.EXCLAMATION
-    elif s == '+':
-        return SYMBOLS.PLUS
-    elif s == '-':
-        return SYMBOLS.MINUS
-    elif s == '(':
-        return SYMBOLS.LPAREN
-    elif s == ')':
-        return SYMBOLS.RPAREN
-    elif s == '0':
-        return SYMBOLS.ZERO
-    else:
-        raise ValueError('Invalid symbol string')
+_handwritten_key = dict()
+_handwritten_path = os.path.join('datasets','handwritten')
+_handwritten_paths = []
+_aida_path = os.path.join('datasets','aida')
+_mnist_path = os.path.join('datasets','mnist')
+
+def get_handwritten_keys():
+    """Gets mappings between symbols and their integer representation
+
+    Returns:
+        tuple[dict[str,int],list[str]]: A dict that maps strings to integers and a list of strings at the same index as the integer
+    """    
+    if len(_handwritten_key) == 0:
+        img_types = os.listdir(_handwritten_path)
+        for i,img_type in enumerate(img_types):
+            _handwritten_key[img_type] = i
+    return _handwritten_key, img_types
+
     
 def open_image(path):
     """Open image from path
@@ -56,7 +47,7 @@ def get_aida_batch(batch_id):
     Yields:
         Mat: image
     """        
-    path = os.path.join('aida dataset',f'batch_{batch_id}','background_images')
+    path = os.path.join(_aida_path,f'batch_{batch_id}','background_images')
     img_names = os.listdir(path)
     for img_name in img_names:
         img_path = os.path.join(path,img_name)
@@ -64,26 +55,28 @@ def get_aida_batch(batch_id):
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.uint8)
         yield img_gray
         
-def get_handwritten_batch(batch_size):
-    """Gets a batch of handwritten images and their symbols
+def get_handwritten_batch(batch_id,batch_count):
+    """Gets a batch of handwritten images and their values, returns a generator.
 
     Args:
-        batch_size (int): how many images to get
+        batch_id (int): batch id (must be less than batch_count)
+        batch_count (int): number of batches total
 
     Yields:
-        tuple[SYMBOLS,Mat]: The Label and the image
+        tuple[str,Mat]: The Label and the image
     """    
-    path = os.path.join('handwritten_math','extracted_images')
-    img_types = os.listdir(path)
-    for _ in range(batch_size):
-        img_type = np.random.choice(img_types)
-        img_type_path = os.path.join(path,img_type)
-        img_names = os.listdir(img_type_path)
-        img_name = np.random.choice(img_names)
-        img_path = os.path.join(img_type_path,img_name)
+    if _handwritten_paths == []:
+        img_types = os.listdir(_handwritten_path)
+        for img_type in img_types:
+            img_type_path = os.path.join(_handwritten_path,img_type)
+            img_names = os.listdir(img_type_path)
+            for img_name in img_names:
+                img_path = os.path.join(img_type_path,img_name)
+                _handwritten_paths.append((img_type,img_path))
+    batch = _handwritten_paths[batch_id*batch_count:(batch_id+1)*batch_count]
+    for img_type,img_path in batch:
         img = open_image(img_path)
-        symbol = get_symbol_from_string(img_type)
-        yield (symbol,img)
+        yield (img_type,img)
 
 def show_img(img):
     """Displays an image
