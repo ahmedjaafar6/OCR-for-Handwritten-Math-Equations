@@ -7,11 +7,10 @@ import os
 import numpy as np
 
 _handwritten_key = dict()
-# ALENNAS PERSONAL FILEPATH TEMPORARY, DO NOT PUSH
-_handwritten_path = os.path.join('handwritten_math')
-_handwritten_paths = []
-_aida_path = os.path.join('aida dataset')
+_handwritten_path = os.path.join('datasets','handwritten')
+_aida_path = os.path.join('datasets','aida')
 _mnist_path = os.path.join('datasets','mnist')
+_handwritten_paths = []
 
 def get_handwritten_keys():
     """Gets mappings between symbols and their integer representation
@@ -19,7 +18,7 @@ def get_handwritten_keys():
     Returns:
         tuple[dict[str,int],list[str]]: A dict that maps strings to integers and a list of strings at the same index as the integer
     """    
-    if len(_handwritten_key) == 0:
+    if not _handwritten_key:
         img_types = os.listdir(_handwritten_path)
         for i,img_type in enumerate(img_types):
             _handwritten_key[img_type] = i
@@ -66,7 +65,8 @@ def get_handwritten_batch(batch_id,batch_count):
     Yields:
         tuple[str,Mat]: The Label and the image
     """    
-    if _handwritten_paths == []:
+    # Initialize paths
+    if not _handwritten_paths:
         img_types = os.listdir(_handwritten_path)
         for img_type in img_types:
             img_type_path = os.path.join(_handwritten_path,img_type)
@@ -74,6 +74,9 @@ def get_handwritten_batch(batch_id,batch_count):
             for img_name in img_names:
                 img_path = os.path.join(img_type_path,img_name)
                 _handwritten_paths.append((img_type,img_path))
+        np.random.shuffle(_handwritten_paths)
+        
+    # Get batch and return 
     batch = _handwritten_paths[batch_id*batch_count:(batch_id+1)*batch_count]
     for img_type,img_path in batch:
         img = open_image(img_path)
