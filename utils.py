@@ -7,9 +7,10 @@ import os
 import numpy as np
 
 _handwritten_key = dict()
-_handwritten_path = os.path.join('datasets','handwritten')
+# ALENNAS PERSONAL FILEPATH TEMPORARY, DO NOT PUSH
+_handwritten_path = os.path.join('handwritten_math')
 _handwritten_paths = []
-_aida_path = os.path.join('datasets','aida')
+_aida_path = os.path.join('aida dataset')
 _mnist_path = os.path.join('datasets','mnist')
 
 def get_handwritten_keys():

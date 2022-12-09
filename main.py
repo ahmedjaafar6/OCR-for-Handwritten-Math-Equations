@@ -3,6 +3,7 @@ import cv2
 from matplotlib import pyplot as plt
 import numpy as np
 import utils
+import statistics
 
 def find_good_contours_thres(img, conts, alpha = 0.005):
     '''+  
@@ -16,10 +17,12 @@ def find_good_contours_thres(img, conts, alpha = 0.005):
     areas = []
     
     for c in conts:
+        print(cv2.contourArea(c))
         areas.append([cv2.contourArea(c)**2])
+        
     #alpha is controlling paramter    
-    thres = alpha * max(areas)[0]
-    
+    thres = alpha * statistics.median(areas)
+    print(thres)
     return thres
 
 def sort_contours(contours, method="left-to-right"):
@@ -74,7 +77,9 @@ def Parser(img, alpha, show=True):
     
     #Find a contour threshold for this dataset (hyperparam!)
     contour_threshold = find_good_contours_thres(erosion, contours, alpha=alpha)
-    print(contour_threshold)
+
+    print("thresh: ", str(contour_threshold))
+
     contours = []
     for c in contours:       
         if( cv2.contourArea(c)**2 > contour_threshold):
