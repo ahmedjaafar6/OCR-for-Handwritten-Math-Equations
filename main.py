@@ -5,7 +5,7 @@ import numpy as np
 import utils
 import statistics
 
-def find_good_contours_thres(img, conts, alpha = 0.005):
+def find_good_contours_thres(img, conts, percentile, alpha = 0.005):
     '''+  
     Function to find threshold of good contours on basis of 10% of maximum area
     Input: Contours, threshold for removing noises
@@ -21,8 +21,8 @@ def find_good_contours_thres(img, conts, alpha = 0.005):
         
     #alpha is controlling parameter 
     areas = np.asarray([x[0] for x in areas])
-    print("Percentile : ", str(np.percentile(areas, 75)))
-    thres = alpha * np.percentile(areas, 75)
+    print("Percentile : ", str(np.percentile(areas, percentile)))
+    thres = alpha * np.percentile(areas, percentile)
     return thres
 
 def sort_contours(contours, method="left-to-right"):
@@ -62,8 +62,11 @@ def Parser(img, alpha, show=True):
     ## apply some dilation and erosion to join the gaps - turn thick contours into lines
     #Selecting elliptical element for dilation    
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
-    dilation = cv2.dilate(img,kernel,iterations = 2)
+    dilation = cv2.dilate(img, kernel ,iterations = 2)
     erosion = cv2.erode(dilation,kernel,iterations = 1)
+
+    plt.imshow(erosion)
+    plt.show()
 
     (thresh, erosion) = cv2.threshold(erosion, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
@@ -74,18 +77,27 @@ def Parser(img, alpha, show=True):
         contours, hierarchy = cv2.findContours(erosion,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     
     #Find a contour threshold for this dataset (hyperparam!)
-    contour_threshold = find_good_contours_thres(erosion, contours, alpha=alpha)
+    small_threshold = find_good_contours_thres(erosion, contours, 80, alpha=alpha)
+    big_threshold = find_good_contours_thres(erosion, contours, 98,  alpha=alpha)
 
-    print("thresh: ", str(contour_threshold))
+    print("thresh: ", str(small_threshold))
 
-    contours_thresh = []
+    remove_circles = []
+    # Remove "inside" of circles
+    for i, ctrs in enumerate(contours):
+        if hierarchy[0, i, 3] == 0 :
+            remove_circles.append(contours[i])
+    contours = remove_circles
+
+    # Exclude contours above "too small" threshold and below "too big"
+    correct_contours_thresh = []
     for c in contours:       
-        if( cv2.contourArea(c)**2 > contour_threshold):
-            
-            contours_thresh.append(c)
+        if( cv2.contourArea(c)**2 > small_threshold and cv2.contourArea(c)**2 < big_threshold):
+            correct_contours_thresh.append(c)
+    contours = correct_contours_thresh
 
     #Retrieved bounding boxes
-    contours_sorted, bounding_boxes = sort_contours(contours_thresh,method="left-to-right")
+    contours_sorted, bounding_boxes = sort_contours(contours, method="left-to-right")
 
     if(show == True):        
         plt.figure(figsize=(15,8))    
@@ -108,9 +120,9 @@ if __name__ == "__main__":
         img = i
         break
 
-    images = Parser(img, 0.005)
+    images, hierarchy = Parser(img, 0.005)
 
-    for im in images:
+    for i, im in enumerate(images):
         plt.imshow(im, cmap="gray")
         plt.show()
 
