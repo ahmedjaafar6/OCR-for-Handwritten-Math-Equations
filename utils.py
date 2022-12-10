@@ -8,9 +8,9 @@ import numpy as np
 # from sklearn.datasets import fetch_openml
 
 _handwritten_key = dict()
-_handwritten_path = os.path.join('datasets','handwritten')
-_aida_path = os.path.join('datasets','aida')
-_mnist_path = os.path.join('datasets','mnist')
+_handwritten_path = os.path.join('handwritten_math')
+_aida_path = os.path.join('aida')
+_mnist_path = os.path.join('mnist')
 _handwritten_paths = []
 
 def get_handwritten_keys(labels=None):
