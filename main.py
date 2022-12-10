@@ -17,12 +17,12 @@ def find_good_contours_thres(img, conts, alpha = 0.005):
     areas = []
     
     for c in conts:
-        print(cv2.contourArea(c))
         areas.append([cv2.contourArea(c)**2])
         
     #alpha is controlling parameter 
-    areas = [x[0] for x in areas]
-    thres = alpha * statistics.median(areas)
+    areas = np.asarray([x[0] for x in areas])
+    print("Percentile : ", str(np.percentile(areas, 75)))
+    thres = alpha * np.percentile(areas, 75)
     return thres
 
 def sort_contours(contours, method="left-to-right"):
@@ -69,25 +69,23 @@ def Parser(img, alpha, show=True):
 
     # Find the contours
     if(cv2.__version__ == '3.3.1'):
-        xyz, contours, hierarchy = cv2.findContours(erosion,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+        xyz, contours, hierarchy = cv2.findContours(erosion,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     else:
-        contours, hierarchy = cv2.findContours(erosion,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
-
-    # print(contours)
+        contours, hierarchy = cv2.findContours(erosion,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     
     #Find a contour threshold for this dataset (hyperparam!)
     contour_threshold = find_good_contours_thres(erosion, contours, alpha=alpha)
 
     print("thresh: ", str(contour_threshold))
 
-    contours = []
+    contours_thresh = []
     for c in contours:       
         if( cv2.contourArea(c)**2 > contour_threshold):
-            contours.append(c)
-        
-    print(len(contours))
+            
+            contours_thresh.append(c)
+
     #Retrieved bounding boxes
-    contours_sorted, bounding_boxes = sort_contours(contours,method="left-to-right")
+    contours_sorted, bounding_boxes = sort_contours(contours_thresh,method="left-to-right")
 
     if(show == True):        
         plt.figure(figsize=(15,8))    
@@ -105,8 +103,8 @@ def Parser(img, alpha, show=True):
 if __name__ == "__main__":
     img = utils.get_aida_batch(1)
     for i in img:
-        # plt.imshow(i)
-        # plt.show()
+        plt.imshow(i)
+        plt.show()
         img = i
         break
 
