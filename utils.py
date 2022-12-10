@@ -5,6 +5,7 @@
 import cv2
 import os
 import numpy as np
+# from sklearn.datasets import fetch_openml
 
 _handwritten_key = dict()
 _handwritten_path = os.path.join('datasets','handwritten')
@@ -12,17 +13,15 @@ _aida_path = os.path.join('datasets','aida')
 _mnist_path = os.path.join('datasets','mnist')
 _handwritten_paths = []
 
-def get_handwritten_keys():
-    """Gets mappings between symbols and their integer representation
-
-    Returns:
-        tuple[dict[str,int],list[str]]: A dict that maps strings to integers and a list of strings at the same index as the integer
-    """    
+def get_handwritten_keys(labels=None):
     if not _handwritten_key:
         img_types = os.listdir(_handwritten_path)
         for i,img_type in enumerate(img_types):
             _handwritten_key[img_type] = i
-    return _handwritten_key, img_types
+    nums = []
+    for label in labels:
+        nums.append(_handwritten_key[label])
+    return np.array(nums)
 
     
 def open_image(path):
@@ -97,14 +96,17 @@ def get_handwritten_batch(batch_id,batch_count):
         
     batch_size = len(_handwritten_paths)//batch_count
     
-    
     # Get batch and return 
     batch = _handwritten_paths[batch_id*batch_size:(batch_id+1)*batch_size]
     print(len(batch))
+    labels = []
+    images = []
     for img_type,img_path in batch:
         img = open_image(img_path)
         img = standardize_image(img, invert=True, to_gray=True, resize=True)
-        yield (img_type,img)
+        labels.append(img_type)
+        images.append(img)
+    return np.array(labels),np.array(images)
 
 def show_img(img):
     """Displays an image
@@ -116,14 +118,32 @@ def show_img(img):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     
+import gzip
+def read_mnist():
+    path = os.path.join(_mnist_path,'t10k-images-idx3-ubyte.gz')
+    with gzip.open(path,'r') as f:
+        image_size = 28
+        num_images = 10000
+        f.read(16)
+        buffer = f.read(image_size * image_size * num_images)
+        data = np.frombuffer(buffer, dtype=np.uint8).astype(np.float32)
+        print(data.shape)
+        data = data.reshape(num_images, image_size, image_size)
+    with gzip.open(os.path.join(_mnist_path,'t10k-labels-idx1-ubyte.gz'),'r') as f:
+        f.read(8)
+        buffer = f.read(10000)
+        labels = np.frombuffer(buffer, dtype=np.uint8).astype(np.int64)
+    return labels,data
+
+import matplotlib.pyplot as plt
+    
 if __name__ == '__main__':
-    res = get_handwritten_batch(0,64)
-    # for i in res:
-    #     print(i[0])
-    #     print(i[1].shape)
-    #     break
-    # n = next(res)
-    # print(n[0])
-    # print(n[1].shape)
-    all_vals = list(res)
+    l,d = read_mnist()
+    print(l.shape,d.shape)
+    for _ in range(10):
+        print(l[_])
+        img = d[_]
+        plt.imshow(img)
+        plt.show()
+    
     
