@@ -37,6 +37,25 @@ def open_image(path):
     img = cv2.imread(path)
     return img
 
+def standardize_image(img, invert=False, resize=False, to_gray=False):
+    """Standardize image by converting to grayscale and resizing
+
+    Args:
+        img (Mat): image
+        invert (bool, optional): invert the image. Defaults to False.
+
+    Returns:
+        Mat: standardized image
+    """    
+    SIZE = (28,28)
+    if resize:
+        img = cv2.resize(img,SIZE)
+    if to_gray:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.uint8)
+    if invert:
+        img = 255 - img
+    return img
+
 
 def get_aida_batch(batch_id):
     """AIDA batch getter, returns grayscale images as a generator
@@ -52,8 +71,8 @@ def get_aida_batch(batch_id):
     for img_name in img_names:
         img_path = os.path.join(path,img_name)
         img = open_image(img_path)
-        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.uint8)
-        yield img_gray
+        img = standardize_image(img, to_gray=True)
+        yield img
         
 def get_handwritten_batch(batch_id,batch_count):
     """Gets a batch of handwritten images and their values, returns a generator.
@@ -84,10 +103,8 @@ def get_handwritten_batch(batch_id,batch_count):
     print(len(batch))
     for img_type,img_path in batch:
         img = open_image(img_path)
-        inverted = (255-img)
-        gray = cv2.cvtColor(inverted, cv2.COLOR_BGR2GRAY).astype(np.uint8)
-        resized = cv2.resize(gray,(28,28))
-        yield (img_type,resized)
+        img = standardize_image(img, invert=True, to_gray=True, resize=True)
+        yield (img_type,img)
 
 def show_img(img):
     """Displays an image
@@ -101,6 +118,12 @@ def show_img(img):
     
 if __name__ == '__main__':
     res = get_handwritten_batch(0,64)
-    first = next(res)
-    second = next(res)
-    print(first[0],second[0])
+    # for i in res:
+    #     print(i[0])
+    #     print(i[1].shape)
+    #     break
+    # n = next(res)
+    # print(n[0])
+    # print(n[1].shape)
+    all_vals = list(res)
+    
