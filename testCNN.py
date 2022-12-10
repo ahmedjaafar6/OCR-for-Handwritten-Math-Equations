@@ -2,26 +2,15 @@ import numpy as np
 import os
 import time
 
-from CNNModel import CNN
+from CNN_Baseline import CNN
 from torch import optim
 import torch.nn as nn
 import torch
+from utils import get_handwritten_batch
 
 # Accuracy placeholder
-accuracy = np.zeros(len(dataTypes))
+# accuracy = np.zeros(len(dataTypes))
 
-#Load data
-path = os.path.join('..', 'data', dataType)
-data = utils.loadmat(path)
-print('+++ Loading dataset: {} ({} images)'.format(dataType, data['x'].shape[2]))
-
-# Organize into numImages x numChannels x width x height
-x = data['x'].transpose([2,0,1])
-x = np.reshape(x,[x.shape[0], 1, x.shape[1], x.shape[2]])
-y = data['y']
-# Convert data into torch tensors
-x = torch.tensor(x).float()
-y = torch.tensor(y).long() # Labels are categorical
 
 # Define the model
 model = CNN()
@@ -31,16 +20,19 @@ model.train()
 loss_fun = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(),lr=0.01)
 
-# Start training
-xTrain = x[data['set']==trainSet,:,:,:]
-yTrain = y[data['set']==trainSet]
-
 
 # Loop over training data in some batches
 # Implement this
 epochs = 1000
 batch_size = 64
+# l = np.array(list(res))
+# labels = l[:,0]
+# img= l[:,1]
+# first = img[0]
 for j in range(epochs):
+    lst = get_handwritten_batch(j,batch_size)
+    print(lst)
+    exit()
     rand_sample_inds = np.random.randint(low=0, high=xTrain.shape[0]-1, size=batch_size)
     rand_sample_x = xTrain[rand_sample_inds]
     rand_sample_y = yTrain[rand_sample_inds]

@@ -76,11 +76,18 @@ def get_handwritten_batch(batch_id,batch_count):
                 _handwritten_paths.append((img_type,img_path))
         np.random.shuffle(_handwritten_paths)
         
+    batch_size = len(_handwritten_paths)//batch_count
+    
+    
     # Get batch and return 
-    batch = _handwritten_paths[batch_id*batch_count:(batch_id+1)*batch_count]
+    batch = _handwritten_paths[batch_id*batch_size:(batch_id+1)*batch_size]
+    print(len(batch))
     for img_type,img_path in batch:
         img = open_image(img_path)
-        yield (img_type,img)
+        inverted = (255-img)
+        gray = cv2.cvtColor(inverted, cv2.COLOR_BGR2GRAY).astype(np.uint8)
+        resized = cv2.resize(gray,(28,28))
+        yield (img_type,resized)
 
 def show_img(img):
     """Displays an image
@@ -91,3 +98,9 @@ def show_img(img):
     cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+    
+if __name__ == '__main__':
+    res = get_handwritten_batch(0,64)
+    first = next(res)
+    second = next(res)
+    print(first[0],second[0])

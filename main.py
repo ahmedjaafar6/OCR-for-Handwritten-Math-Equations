@@ -20,9 +20,9 @@ def find_good_contours_thres(img, conts, alpha = 0.005):
         print(cv2.contourArea(c))
         areas.append([cv2.contourArea(c)**2])
         
-    #alpha is controlling paramter    
+    #alpha is controlling parameter 
+    areas = [x[0] for x in areas]
     thres = alpha * statistics.median(areas)
-    print(thres)
     return thres
 
 def sort_contours(contours, method="left-to-right"):
@@ -85,6 +85,7 @@ def Parser(img, alpha, show=True):
         if( cv2.contourArea(c)**2 > contour_threshold):
             contours.append(c)
         
+    print(len(contours))
     #Retrieved bounding boxes
     contours_sorted, bounding_boxes = sort_contours(contours,method="left-to-right")
 
@@ -104,8 +105,8 @@ def Parser(img, alpha, show=True):
 if __name__ == "__main__":
     img = utils.get_aida_batch(1)
     for i in img:
-        plt.imshow(i)
-        plt.show()
+        # plt.imshow(i)
+        # plt.show()
         img = i
         break
 
