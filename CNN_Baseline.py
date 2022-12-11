@@ -1,4 +1,5 @@
 import torch.nn as nn
+from utils import get_key_length
 
 class CNN(nn.Module):
     def __init__(self):
@@ -44,7 +45,8 @@ class CNN(nn.Module):
                         
         )
         #Fully connected layer
-        self.out = nn.Linear(1080, 10)
+        
+        self.out = nn.Linear(1080, get_key_length())
 
     def forward(self, x):
         x = self.conv1(x)

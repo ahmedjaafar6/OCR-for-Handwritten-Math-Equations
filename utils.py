@@ -16,7 +16,12 @@ _mnist_path = os.path.join('datasets', 'mnist')
 _handwritten_paths = []
 
 
-def get_handwritten_keys(labels=None):
+def get_key_length():
+    get_handwritten_keys()
+    return len(_handwritten_key)
+
+
+def get_handwritten_keys(labels=[]):
     if not _handwritten_key:
         img_types = os.listdir(_handwritten_path)
         for i, img_type in enumerate(img_types):
@@ -107,7 +112,7 @@ def get_handwritten_batch(batch_count, batch_min, batch_max=None):
 
     # Get batch and return
     batch = _handwritten_paths[batch_min * batch_size:batch_max*batch_size]
-    print(len(batch))
+    # print(len(batch))
     labels = []
     images = []
     for img_type, img_path in batch:
