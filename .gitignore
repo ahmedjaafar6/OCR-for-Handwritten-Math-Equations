@@ -1,6 +1,2 @@
-# Aida Dataset Folder
-aida
-handwritten_math
-*.zip
 __pycache__
 datasets
