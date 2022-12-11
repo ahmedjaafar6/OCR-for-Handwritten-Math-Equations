@@ -99,7 +99,9 @@ def get_handwritten_batch(batch_count, batch_min, batch_max=None):
     if not _handwritten_paths:
         img_types = os.listdir(_handwritten_path)
         for img_type in img_types:
-            img_type_path = os.path.join(_handwritten_path, img_type)
+            img_type_path = os.path.join(_mnist_path, img_type)
+            if not os.path.isdir(img_type_path):
+                img_type_path = os.path.join(_handwritten_path, img_type)
             img_names = os.listdir(img_type_path)
             for img_name in img_names:
                 img_path = os.path.join(img_type_path, img_name)
@@ -186,11 +188,18 @@ def one_hot(y, num_classes):
     return np.eye(num_classes)[y]
 
 
+def mnist_to_files():
+    labels, data = read_mnist()
+    for _, (label, img) in enumerate(zip(labels, data)):
+        path = os.path.join(_mnist_path, str(label))
+        if not os.path.exists(path):
+            os.mkdir(path)
+        img_path = os.path.join(path, f'{label}_{_}.jpg')
+        if os.path.exists(img_path):
+            continue
+        cv2.imwrite(img_path, img)
+
+
 if __name__ == '__main__':
-    l, d = read_mnist()
-    print(l.shape, d.shape)
-    for _ in range(10):
-        print(l[_])
-        img = d[_]
-        plt.imshow(img)
-        plt.show()
+    # mnist_to_files()
+    # get_handwritten_batch(10000, 0)
