@@ -5,10 +5,10 @@ from CNN_Baseline import CNN
 from torch import optim
 import torch.nn as nn
 import torch
-from utils import get_handwritten_batch, get_handwritten_keys, evaluateLabels
+from utils import get_handwritten_batch, get_handwritten_keys, evaluateLabels, mnist_to_files
 
-# Accuracy placeholder
-# accuracy = np.zeros(len(dataTypes))
+#add mnist images to dataset folder
+mnist_to_files()
 
 
 # Define the model
@@ -63,3 +63,7 @@ yPred = torch.argmax(model(xTest), dim=1).numpy()
 yTest_num = yTest_num.numpy()
 (acc, conf) = evaluateLabels(yTest_num, yPred, False)
 print('Accuracy {:.2f} %\n'.format(acc*100))
+
+
+#Save model
+torch.save(model.state_dict(), "CNN_Baseline.pt")
