@@ -97,6 +97,11 @@ def Parser(img, alpha, show=True):
             correct_contours_thresh.append(c)
     contours = correct_contours_thresh
 
+    cv2.drawContours(img, contours, -1)
+    cv2.imshow("result", img)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
+
     #Retrieved bounding boxes
     contours_sorted, bounding_boxes = sort_contours(contours, method="left-to-right")
 
@@ -105,11 +110,6 @@ def Parser(img, alpha, show=True):
         plt.axis("on")
         plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         plt.show()
-
-        cv2.drawContours(img, contours, -1, (255, 0, 0), 3)
-        cv2.imshow("result", img)
-        cv2.waitKey()
-        cv2.destroyAllWindows()
 
     extracted_symbols = []
     for i, box in enumerate(bounding_boxes):
