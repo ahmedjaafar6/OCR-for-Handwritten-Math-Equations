@@ -198,3 +198,4 @@ def mnist_to_files():
 if __name__ == '__main__':
     # mnist_to_files()
     # get_handwritten_batch(10000, 0)
+    pass

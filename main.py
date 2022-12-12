@@ -75,6 +75,7 @@ def Parser(img, alpha, show=True):
         xyz, contours, hierarchy = cv2.findContours(erosion,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     else:
         contours, hierarchy = cv2.findContours(erosion,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+
     
     #Find a contour threshold for this dataset (hyperparam!)
     small_threshold = find_good_contours_thres(erosion, contours, 80, alpha=alpha)
@@ -95,6 +96,11 @@ def Parser(img, alpha, show=True):
         if( cv2.contourArea(c)**2 > small_threshold and cv2.contourArea(c)**2 < big_threshold):
             correct_contours_thresh.append(c)
     contours = correct_contours_thresh
+
+    cv2.drawContours(img, contours, -1)
+    cv2.imshow("result", img)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
 
     #Retrieved bounding boxes
     contours_sorted, bounding_boxes = sort_contours(contours, method="left-to-right")
@@ -122,7 +128,7 @@ if __name__ == "__main__":
 
     images, hierarchy = Parser(img, 0.005)
 
-    for i, im in enumerate(images):
-        plt.imshow(im, cmap="gray")
-        plt.show()
+    # for i, im in enumerate(images):
+    #     plt.imshow(im, cmap="gray")
+    #     plt.show()
 
