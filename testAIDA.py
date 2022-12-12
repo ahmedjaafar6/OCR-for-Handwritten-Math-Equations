@@ -17,4 +17,7 @@ model = CNN()
 model.load_state_dict(torch.load("CNN_Baseline.pt"))
 model.eval()
 
-p = Parser(images[0], 0.005)
+p = Parser(images[0], 0.005, show=False)
+i = np.array(p[0]).astype(np.float32)
+i = standardize_image(i, resize=True)
+print(i)
