@@ -19,5 +19,5 @@ model.eval()
 
 p = Parser(images[0], 0.005, show=False)
 i = np.array(p[0]).astype(np.float32)
-i = standardize_image(i, resize=True)
+i = standardize_image(i, square=True)
 print(i)
