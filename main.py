@@ -1,4 +1,5 @@
 # Main file for project
+import copy
 import cv2
 from matplotlib import pyplot as plt
 import numpy as np
@@ -62,11 +63,13 @@ def Parser(img, alpha, show=True):
     ## apply some dilation and erosion to join the gaps - turn thick contours into lines
     #Selecting elliptical element for dilation    
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
-    dilation = cv2.dilate(img, kernel ,iterations = 2)
-    erosion = cv2.erode(dilation,kernel,iterations = 1)
+    # dilation = cv2.dilate(img, kernel ,iterations = 2)
+    # erosion = cv2.erode(dilation,kernel,iterations = 1)
 
-    plt.imshow(erosion)
-    plt.show()
+    # plt.imshow(erosion)
+    # plt.show()
+
+    erosion = img
 
     (thresh, erosion) = cv2.threshold(erosion, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
@@ -79,9 +82,16 @@ def Parser(img, alpha, show=True):
     
     #Find a contour threshold for this dataset (hyperparam!)
     small_threshold = find_good_contours_thres(erosion, contours, 80, alpha=alpha)
-    big_threshold = find_good_contours_thres(erosion, contours, 98,  alpha=alpha)
+    big_threshold = find_good_contours_thres(erosion, contours, 100,  alpha=alpha)
 
     print("thresh: ", str(small_threshold))
+
+    contours_img_copy = copy.deepcopy(img)
+    cv2.drawContours(contours_img_copy, contours, -1, (255, 0, 0), 3)
+    cv2.imshow("result", contours_img_copy)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
+
 
     remove_circles = []
     # Remove "inside" of circles
@@ -90,6 +100,13 @@ def Parser(img, alpha, show=True):
             remove_circles.append(contours[i])
     contours = remove_circles
 
+    contours_img_copy = copy.deepcopy(img)
+    cv2.drawContours(contours_img_copy, contours, -1, (255, 0, 0), 3)
+    cv2.imshow("result", contours_img_copy)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
+
+
     # Exclude contours above "too small" threshold and below "too big"
     correct_contours_thresh = []
     for c in contours:       
@@ -97,8 +114,9 @@ def Parser(img, alpha, show=True):
             correct_contours_thresh.append(c)
     contours = correct_contours_thresh
 
-    cv2.drawContours(img, contours, -1)
-    cv2.imshow("result", img)
+    contours_img_copy = copy.deepcopy(img)
+    cv2.drawContours(contours_img_copy, contours, -1, (255, 0, 0), 3)
+    cv2.imshow("result", contours_img_copy)
     cv2.waitKey()
     cv2.destroyAllWindows()
 
@@ -110,23 +128,31 @@ def Parser(img, alpha, show=True):
         plt.axis("on")
         plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         plt.show()
-
+    
+    borders_img_copy = copy.deepcopy(img)
     extracted_symbols = []
     for i, box in enumerate(bounding_boxes):
         x, y, l, h = box
         extracted_symbols.append(img[y : y + h, x : x + l])
+        cv2.rectangle(borders_img_copy, (x,y), (x + l, y + h), (255, 0, 0), 3)
 
+    cv2.imshow("result", borders_img_copy)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
     return extracted_symbols
 
 if __name__ == "__main__":
     img = utils.get_aida_batch(1)
+    ct = 0
     for i in img:
-        plt.imshow(i)
-        plt.show()
-        img = i
-        break
+        if ct == 13:
+            plt.imshow(i)
+            plt.show()
+            img = i
+            break
+        ct += 1
 
-    images, hierarchy = Parser(img, 0.005)
+    images = Parser(img, 0.005)
 
     # for i, im in enumerate(images):
     #     plt.imshow(im, cmap="gray")
