@@ -62,9 +62,9 @@ def standardize_image(img, invert=False, resize=False, to_gray=False, square=Fal
         if img.shape[0] > img.shape[1]:
             diff = img.shape[0] - img.shape[1]
             if diff % 2 == 0:
-                img = np.pad(img, ((0,0), (diff / 2, diff / 2), (0,0)), constant_values=0, mode="constant")
+                img = np.pad(img, ((0,0), (diff // 2, diff // 2)), constant_values=0, mode="constant")
             else:
-                img = np.pad(img, ((0,0), (diff / 2 + 1, diff / 2), (0,0)), constant_values=0, mode="constant")
+                img = np.pad(img, ((0,0), (diff // 2 + 1, diff // 2)), constant_values=0, mode="constant")
 
         if img.shape[1] > img.shape[0]:
             diff = img.shape[1] - img.shape[0]

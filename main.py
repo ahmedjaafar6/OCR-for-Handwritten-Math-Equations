@@ -88,9 +88,9 @@ def Parser(img, alpha, show=True):
 
     contours_img_copy = copy.deepcopy(img)
     cv2.drawContours(contours_img_copy, contours, -1, (255, 0, 0), 3)
-    cv2.imshow("result", contours_img_copy)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # cv2.imshow("result", contours_img_copy)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
 
 
     remove_circles = []
@@ -102,9 +102,9 @@ def Parser(img, alpha, show=True):
 
     contours_img_copy = copy.deepcopy(img)
     cv2.drawContours(contours_img_copy, contours, -1, (255, 0, 0), 3)
-    cv2.imshow("result", contours_img_copy)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # cv2.imshow("result", contours_img_copy)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
 
 
     # Exclude contours above "too small" threshold and below "too big"
@@ -116,9 +116,9 @@ def Parser(img, alpha, show=True):
 
     contours_img_copy = copy.deepcopy(img)
     cv2.drawContours(contours_img_copy, contours, -1, (255, 0, 0), 3)
-    cv2.imshow("result", contours_img_copy)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # cv2.imshow("result", contours_img_copy)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
 
     #Retrieved bounding boxes
     contours_sorted, bounding_boxes = sort_contours(contours, method="left-to-right")
@@ -136,9 +136,9 @@ def Parser(img, alpha, show=True):
         extracted_symbols.append(img[y : y + h, x : x + l])
         cv2.rectangle(borders_img_copy, (x,y), (x + l, y + h), (255, 0, 0), 3)
 
-    cv2.imshow("result", borders_img_copy)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # cv2.imshow("result", borders_img_copy)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
     return extracted_symbols
 
 if __name__ == "__main__":
