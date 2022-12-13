@@ -7,6 +7,7 @@ from main import Parser, results_overlay
 
 def testAIDA():
     images = []
+    border_list = []
     batch = get_aida_batch(2)
     for i in range(10):
         images.append(next(batch))
@@ -19,7 +20,8 @@ def testAIDA():
 
     img_predictions = []
     for img in images:
-        all_slices = Parser(img, 0.005, show=False)
+        all_slices, borders = Parser(img, 0.005, show=False)
+        border_list.append(borders)
         preds = []
         for slic in all_slices:
             slic = slic.astype(np.float32)
@@ -31,8 +33,10 @@ def testAIDA():
             preds.append(yPred_val)
         img_predictions.append(np.array(preds))
     img_predictions = np.array(img_predictions)
-    return images, img_predictions
+    return images, img_predictions, border_list
 
 
 if __name__ == "__main__":
-    print(testAIDA())
+    images, img_predictions, borders = testAIDA()
+
+    results_overlay(images, img_predictions, borders)

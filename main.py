@@ -143,10 +143,20 @@ def Parser(img, alpha, show=True):
     cv2.imshow("result", borders_img_copy)
     cv2.waitKey()
     cv2.destroyAllWindows()
-    return extracted_symbols
+    return extracted_symbols, bounding_boxes
 
 
-def results_overlay():
+def results_overlay(imgs, predictions, borders):
+    for i in range(len(predictions)):
+        for s in range(predictions[i]):
+            symbol_pred = predictions[i][s]
+            x,y,l,h = borders[i]
+            cv2.putText(imgs[i], symbol_pred, (x,y), cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 0), 3)
+        
+        cv2.imshow("result", imgs[i])
+        cv2.waitKey()
+        cv2.destroyAllWindows()
+        
     pass
 
 if __name__ == "__main__":
