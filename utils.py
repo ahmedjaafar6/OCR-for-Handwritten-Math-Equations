@@ -17,6 +17,7 @@ _handwritten_paths = []
 
 
 def get_key_length():
+    global _handwritten_key
     get_handwritten_keys()
     return len(_handwritten_key)
 
