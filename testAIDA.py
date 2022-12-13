@@ -1,6 +1,6 @@
 from CNN_Baseline import CNN
 import torch
-from utils import get_aida_batch, standardize_image
+from utils import get_aida_batch, standardize_image, get_handwritten_values
 import numpy as np
 from main import Parser
 
@@ -24,13 +24,15 @@ def testAIDA():
         for slic in all_slices:
             slic = slic.astype(np.float32)
             slic = standardize_image(slic, square=True, resize=True)
-            slic = np.reshape(slic, [1, 1,slic.shape[0], slic.shape[1]])
+            slic = np.reshape(slic, [1, 1, slic.shape[0], slic.shape[1]])
             slic = torch.tensor(slic).float()
             yPred = torch.argmax(model(slic), dim=1).numpy()
-            preds.append(yPred[0])
+            yPred_val = get_handwritten_values(yPred)[0]
+            preds.append(yPred_val)
         img_predictions.append(np.array(preds))
     img_predictions = np.array(img_predictions)
     return img_predictions
 
-# if __name__ == "__main__":
-#     print(testAIDA())
+
+if __name__ == "__main__":
+    print(testAIDA())

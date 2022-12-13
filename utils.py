@@ -22,17 +22,15 @@ def get_key_length():
 
 
 def get_handwritten_keys(labels=[]):
+    global _handwritten_key
     if not _handwritten_key:
-        img_types = os.listdir(_handwritten_path)
-        for i, img_type in enumerate(img_types):
-            _handwritten_key[img_type] = i
-    nums = []
-    for label in labels:
-        nums.append(_handwritten_key[label])
-    return np.array(nums)
+        path = os.listdir(_handwritten_path)
+        _handwritten_key = {label: i for i, label in enumerate(path)}
+    return np.array([_handwritten_key[label] for label in labels])
 
 
 def get_handwritten_values(nums=[]):
+    global _handwritten_key
     if not _handwritten_key:
         get_handwritten_keys()
     s = sorted(_handwritten_key.keys(), key=lambda st: _handwritten_key[st])
