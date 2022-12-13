@@ -32,6 +32,12 @@ def get_handwritten_keys(labels=[]):
     return np.array(nums)
 
 
+def get_handwritten_values(nums=[]):
+    get_handwritten_keys()
+    s = sorted(_handwritten_key.keys(), key=lambda st: _handwritten_key[st])
+    return np.array([s[i] for i in nums])
+
+
 def open_image(path):
     """Open image from path
 
@@ -62,16 +68,20 @@ def standardize_image(img, invert=False, resize=False, to_gray=False, square=Fal
         if img.shape[0] > img.shape[1]:
             diff = img.shape[0] - img.shape[1]
             if diff % 2 == 0:
-                img = np.pad(img, ((0,0), (diff // 2, diff // 2)), constant_values=0, mode="constant")
+                img = np.pad(img, ((0, 0), (diff // 2, diff // 2)),
+                             constant_values=0, mode="constant")
             else:
-                img = np.pad(img, ((0,0), (diff // 2 + 1, diff // 2)), constant_values=0, mode="constant")
+                img = np.pad(img, ((0, 0), (diff // 2 + 1, diff // 2)),
+                             constant_values=0, mode="constant")
 
         if img.shape[1] > img.shape[0]:
             diff = img.shape[1] - img.shape[0]
             if diff % 2 == 0:
-                img = np.pad(img, ((diff // 2, diff // 2)), constant_values=0, mode="constant")
+                img = np.pad(img, ((diff // 2, diff // 2)),
+                             constant_values=0, mode="constant")
             else:
-                img = np.pad(img, ((diff // 2 + 1, diff // 2)), constant_values=0, mode="constant")
+                img = np.pad(img, ((diff // 2 + 1, diff // 2)),
+                             constant_values=0, mode="constant")
     if resize:
         img = cv2.resize(img, SIZE)
     if to_gray:
