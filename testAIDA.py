@@ -2,7 +2,7 @@ from CNN_Baseline import CNN
 import torch
 from utils import get_aida_batch, standardize_image, get_handwritten_values
 import numpy as np
-from main import Parser
+from main import Parser, results_overlay
 
 
 def testAIDA():
@@ -31,7 +31,7 @@ def testAIDA():
             preds.append(yPred_val)
         img_predictions.append(np.array(preds))
     img_predictions = np.array(img_predictions)
-    return img_predictions
+    return images, img_predictions
 
 
 if __name__ == "__main__":

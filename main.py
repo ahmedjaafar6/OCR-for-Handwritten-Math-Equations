@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import utils
 import statistics
-import testAIDA
 
 def find_good_contours_thres(img, conts, percentile, alpha = 0.005):
     '''+  
@@ -151,6 +150,7 @@ def results_overlay():
     pass
 
 if __name__ == "__main__":
+    pass
     # img = utils.get_aida_batch(1)
     # ct = 0
     # for i in img:
@@ -163,7 +163,7 @@ if __name__ == "__main__":
 
     # images = Parser(img, 0.005)
 
-    img_results = testAIDA.testAIDA()
+    # img_results = testAIDA.testAIDA()
 
-    print(img_results.shape)
+    # print(img_results.shape)
 
