@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import utils
 import statistics
+import testAIDA
 
 def find_good_contours_thres(img, conts, percentile, alpha = 0.005):
     '''+  
@@ -69,7 +70,7 @@ def Parser(img, alpha, show=True):
     # plt.imshow(erosion)
     # plt.show()
 
-    erosion = img
+    erosion = copy.deepcopy(img)
 
     (thresh, erosion) = cv2.threshold(erosion, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
@@ -87,10 +88,11 @@ def Parser(img, alpha, show=True):
     print("thresh: ", str(small_threshold))
 
     contours_img_copy = copy.deepcopy(img)
-    cv2.drawContours(contours_img_copy, contours, -1, (255, 0, 0), 3)
-    # cv2.imshow("result", contours_img_copy)
-    # cv2.waitKey()
-    # cv2.destroyAllWindows()
+    contours_img_copy = cv2.cvtColor(contours_img_copy,cv2.COLOR_GRAY2RGB)
+    cv2.drawContours(contours_img_copy, contours, -1, (208, 120, 252), 3)
+    cv2.imshow("result", contours_img_copy)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
 
 
     remove_circles = []
@@ -101,10 +103,11 @@ def Parser(img, alpha, show=True):
     contours = remove_circles
 
     contours_img_copy = copy.deepcopy(img)
-    cv2.drawContours(contours_img_copy, contours, -1, (255, 0, 0), 3)
-    # cv2.imshow("result", contours_img_copy)
-    # cv2.waitKey()
-    # cv2.destroyAllWindows()
+    contours_img_copy = cv2.cvtColor(contours_img_copy,cv2.COLOR_GRAY2RGB)
+    cv2.drawContours(contours_img_copy, contours, -1, (208, 120, 252), 3)
+    cv2.imshow("result", contours_img_copy)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
 
 
     # Exclude contours above "too small" threshold and below "too big"
@@ -115,10 +118,11 @@ def Parser(img, alpha, show=True):
     contours = correct_contours_thresh
 
     contours_img_copy = copy.deepcopy(img)
-    cv2.drawContours(contours_img_copy, contours, -1, (255, 0, 0), 3)
-    # cv2.imshow("result", contours_img_copy)
-    # cv2.waitKey()
-    # cv2.destroyAllWindows()
+    contours_img_copy = cv2.cvtColor(contours_img_copy,cv2.COLOR_GRAY2RGB)
+    cv2.drawContours(contours_img_copy, contours, -1, (208, 120, 252), 3)
+    cv2.imshow("result", contours_img_copy)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
 
     #Retrieved bounding boxes
     contours_sorted, bounding_boxes = sort_contours(contours, method="left-to-right")
@@ -130,31 +134,36 @@ def Parser(img, alpha, show=True):
         plt.show()
     
     borders_img_copy = copy.deepcopy(img)
+    borders_img_copy = cv2.cvtColor(borders_img_copy,cv2.COLOR_GRAY2RGB)
     extracted_symbols = []
     for i, box in enumerate(bounding_boxes):
         x, y, l, h = box
         extracted_symbols.append(img[y : y + h, x : x + l])
         cv2.rectangle(borders_img_copy, (x,y), (x + l, y + h), (255, 0, 0), 3)
 
-    # cv2.imshow("result", borders_img_copy)
-    # cv2.waitKey()
-    # cv2.destroyAllWindows()
+    cv2.imshow("result", borders_img_copy)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
     return extracted_symbols
 
+
+def results_overlay():
+    pass
+
 if __name__ == "__main__":
-    img = utils.get_aida_batch(1)
-    ct = 0
-    for i in img:
-        if ct == 13:
-            plt.imshow(i)
-            plt.show()
-            img = i
-            break
-        ct += 1
+    # img = utils.get_aida_batch(1)
+    # ct = 0
+    # for i in img:
+    #     if ct == 26:
+    #         plt.imshow(i)
+    #         plt.show()
+    #         img = i
+    #         break
+    #     ct += 1
 
-    images = Parser(img, 0.005)
+    # images = Parser(img, 0.005)
 
-    # for i, im in enumerate(images):
-    #     plt.imshow(im, cmap="gray")
-    #     plt.show()
+    img_results = testAIDA.testAIDA()
+
+    print(img_results.shape)
 
