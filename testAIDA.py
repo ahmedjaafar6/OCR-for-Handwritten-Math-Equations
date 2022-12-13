@@ -11,7 +11,6 @@ def testAIDA():
     batch = get_aida_batch(2)
     for i in range(10):
         images.append(next(batch))
-    images = np.array(images)
 
     # Test with AIDA
     model = CNN()
@@ -32,7 +31,6 @@ def testAIDA():
             yPred_val = get_handwritten_values(yPred)[0]
             preds.append(yPred_val)
         img_predictions.append(np.array(preds))
-    img_predictions = np.array(img_predictions)
     return images, img_predictions, border_list
 
 

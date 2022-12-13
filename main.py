@@ -89,9 +89,9 @@ def Parser(img, alpha, show=True):
     contours_img_copy = copy.deepcopy(img)
     contours_img_copy = cv2.cvtColor(contours_img_copy,cv2.COLOR_GRAY2RGB)
     cv2.drawContours(contours_img_copy, contours, -1, (208, 120, 252), 3)
-    cv2.imshow("result", contours_img_copy)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # cv2.imshow("result", contours_img_copy)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
 
 
     remove_circles = []
@@ -104,9 +104,9 @@ def Parser(img, alpha, show=True):
     contours_img_copy = copy.deepcopy(img)
     contours_img_copy = cv2.cvtColor(contours_img_copy,cv2.COLOR_GRAY2RGB)
     cv2.drawContours(contours_img_copy, contours, -1, (208, 120, 252), 3)
-    cv2.imshow("result", contours_img_copy)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # cv2.imshow("result", contours_img_copy)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
 
 
     # Exclude contours above "too small" threshold and below "too big"
@@ -119,9 +119,9 @@ def Parser(img, alpha, show=True):
     contours_img_copy = copy.deepcopy(img)
     contours_img_copy = cv2.cvtColor(contours_img_copy,cv2.COLOR_GRAY2RGB)
     cv2.drawContours(contours_img_copy, contours, -1, (208, 120, 252), 3)
-    cv2.imshow("result", contours_img_copy)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # cv2.imshow("result", contours_img_copy)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
 
     #Retrieved bounding boxes
     contours_sorted, bounding_boxes = sort_contours(contours, method="left-to-right")
@@ -140,17 +140,17 @@ def Parser(img, alpha, show=True):
         extracted_symbols.append(img[y : y + h, x : x + l])
         cv2.rectangle(borders_img_copy, (x,y), (x + l, y + h), (255, 0, 0), 3)
 
-    cv2.imshow("result", borders_img_copy)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+    # cv2.imshow("result", borders_img_copy)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
     return extracted_symbols, bounding_boxes
 
 
 def results_overlay(imgs, predictions, borders):
     for i in range(len(predictions)):
-        for s in range(predictions[i]):
+        for s in range(len(predictions[i])):
             symbol_pred = predictions[i][s]
-            x,y,l,h = borders[i]
+            x,y,l,h = borders[i][s]
             cv2.putText(imgs[i], symbol_pred, (x,y), cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 0), 3)
         
         cv2.imshow("result", imgs[i])
