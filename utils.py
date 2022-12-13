@@ -33,7 +33,8 @@ def get_handwritten_keys(labels=[]):
 
 
 def get_handwritten_values(nums=[]):
-    get_handwritten_keys()
+    if not _handwritten_key:
+        get_handwritten_keys()
     s = sorted(_handwritten_key.keys(), key=lambda st: _handwritten_key[st])
     return np.array([s[i] for i in nums])
 
