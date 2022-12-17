@@ -20,10 +20,8 @@ loss_fun = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.01)
 
 
-# Loop over training data in some batches
-# Implement this
-batch_count = 500
-# batch_size = 64
+
+batch_count = 5000
 for batch_id in range(300): #int(batch_count*0.8)
     if batch_id % 100 == 0:
         print('Batch_id: {}'.format(batch_id))
@@ -66,4 +64,4 @@ print('Accuracy {:.2f} %\n'.format(acc*100))
 
 
 #Save model
-torch.save(model.state_dict(), "CNN_Baseline.pt")
+# torch.save(model.state_dict(), "CNN_Baseline.pt")
