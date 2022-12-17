@@ -25,7 +25,7 @@ optimizer = optim.Adadelta(model.parameters(), lr=0.9, rho=0.95, eps=1e-10)
 start = time.time()
 batch_count = 4500
 mini_batch_iter = 10
-for batch_id in range(1000): #int(batch_count*0.8)
+for batch_id in range(int(batch_count*0.8)):
     if batch_id % 50 == 0:
         print('Batch_id: {}'.format(batch_id), end='\r')
     labels, images = get_handwritten_batch(batch_count, batch_id)
@@ -47,16 +47,18 @@ for batch_id in range(1000): #int(batch_count*0.8)
 
 # Validate Model
 yVal, xVal = get_handwritten_batch(batch_count, int(batch_count*0.8), int(batch_count*0.9))
-xVal = np.reshape(xVal, [xVal.shape[0], 1, xVal.shape[1], xVal.shape[2]])[:2000]
+xVal = np.reshape(xVal, [xVal.shape[0], 1, xVal.shape[1], xVal.shape[2]])
 xVal = torch.tensor(xVal).float()
 yVal_num = get_handwritten_keys(yVal)
-yVal_num = torch.tensor(yVal_num).long()[:2000]
+yVal_num = torch.tensor(yVal_num).long()
 
-yPred = np.zeros(yVal.shape[0])
+yPred = np.array([])
 model.eval()  # Set this to evaluation mode
-print('hi')
-yPred = torch.argmax(model(xVal), dim=1).numpy()
-print('bye')
+with torch.no_grad():
+    batches = np.split(xVal, xVal.shape[0]//800)
+    for b in batches:
+        yPred_b = torch.argmax(model(b), dim=1).numpy()
+        yPred = np.concatenate((yPred, yPred_b))
 
 # Map it back to numpy
 yVal_num = yVal_num.numpy()
@@ -66,22 +68,24 @@ print('Validation Accuracy {:.2f} %\n'.format(acc*100))
 
 
 
-
 #Test model
 yTest, xTest = get_handwritten_batch(batch_count, int(batch_count*0.9), int(batch_count))
-xTest = np.reshape(xTest, [xTest.shape[0], 1, xTest.shape[1], xTest.shape[2]])[:1000]
+xTest = np.reshape(xTest, [xTest.shape[0], 1, xTest.shape[1], xTest.shape[2]])
 xTest = torch.tensor(xTest).float()
 yTest_num = get_handwritten_keys(yTest)
-yTest_num = torch.tensor(yTest_num).long()[:1000]
+yTest_num = torch.tensor(yTest_num).long()
 
 
 yPred = np.zeros(yTest.shape[0])
 model.eval()  # Set this to evaluation mode
-print('hi2')
-yPred = torch.argmax(model(xTest), dim=1).numpy()
-print('bye2')
+with torch.no_grad():
+    batches = np.split(xTest, xTest.shape[0]//800)
+    for b in batches:
+        yPred_b = torch.argmax(model(b), dim=1).numpy()
+        yPred = np.concatenate((yPred, yPred_b))
 
-# Map it back to numpy
+
+# # Map it back to numpy
 yTest_num = yTest_num.numpy()
 (acc, conf) = evaluateLabels(yTest_num, yPred, False)
 print('Testing Accuracy {:.2f} %\n'.format(acc*100))
