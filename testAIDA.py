@@ -9,9 +9,10 @@ import matplotlib.pyplot as plt
 def testAIDA():
     images = []
     border_list = []
-    batch = get_aida_batch(2)
-    for i in range(2):
-        images.append(next(batch))
+    batch = get_aida_batch(1)
+    # for i in range(0,2):
+    next(batch)
+    images.append(next(batch))
 
     # Test with AIDA
     model = CNN()
@@ -33,8 +34,6 @@ def testAIDA():
                 yPred = torch.argmax(model(slic), dim=1).numpy()
             yPred_val = get_handwritten_values(yPred)[0]
             preds.append(yPred_val)
-            # plt.imshow(slic[0][0], cmap="gray")
-            # plt.show()
         img_predictions.append(np.array(preds))
     return images, img_predictions, border_list
 

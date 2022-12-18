@@ -141,15 +141,27 @@ def Parser(img, alpha, show=True):
     borders_img_copy = copy.deepcopy(img)
     borders_img_copy = cv2.cvtColor(borders_img_copy, cv2.COLOR_GRAY2RGB)
     extracted_symbols = []
+    bounding_boxes = list(bounding_boxes)
+    bounding_boxes_new = []
+
     for i, box in enumerate(bounding_boxes):
         x, y, l, h = box
-        extracted_symbols.append(img[y: y + h, x: x + l])
+        inside = False
+        for _, outbox in enumerate(bounding_boxes):
+            xb, yb, lb, hb = outbox
+            if xb < x and yb < y and xb + lb > x + l and yb + hb > y + h:
+                inside = True
+
+        if inside == False:
+            bounding_boxes_new.append(bounding_boxes[i])
+            extracted_symbols.append(img[y: y + h, x: x + l])
+
         cv2.rectangle(borders_img_copy, (x, y), (x + l, y + h), (255, 0, 0), 3)
 
     # cv2.imshow("result", borders_img_copy)
     # cv2.waitKey()
     # cv2.destroyAllWindows()
-    return extracted_symbols, bounding_boxes
+    return extracted_symbols, bounding_boxes_new
 
 
 def results_overlay(imgs, predictions, borders):
@@ -158,6 +170,10 @@ def results_overlay(imgs, predictions, borders):
             symbol_pred = predictions[i][s]
             x, y, l, h = borders[i][s]
             cv2.rectangle(imgs[i], (x, y), (x + l, y + h), (255, 0, 0), 3)
+    for i in range(len(predictions)):
+        for s in range(len(predictions[i])):
+            symbol_pred = predictions[i][s]
+            x, y, l, h = borders[i][s]
             cv2.putText(imgs[i], symbol_pred, (x, y),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 1)
 
