@@ -21,9 +21,9 @@ optimizer = optim.Adam(model.parameters(), lr=0.01)
 
 
 
-batch_count = 5000
+batch_count = 500
 for batch_id in range(300): #int(batch_count*0.8)
-    if batch_id % 100 == 0:
+    if batch_id % 50 == 0:
         print('Batch_id: {}'.format(batch_id))
     labels, images = get_handwritten_batch(batch_count, batch_id)
     images = np.reshape(images, [images.shape[0], 1, images.shape[1], images.shape[2]])
@@ -44,18 +44,22 @@ for batch_id in range(300): #int(batch_count*0.8)
         optimizer.step()
 
 # Test model
-yTest, xTest = get_handwritten_batch(batch_count, int(batch_count*0.8), int(batch_count*0.9))
-xTest = np.reshape(xTest, [xTest.shape[0], 1, xTest.shape[1], xTest.shape[2]])[:10000]
+yTest, xTest = get_handwritten_batch(batch_count, int(batch_count*0.9), int(batch_count))
+xTest = np.reshape(xTest, [xTest.shape[0], 1, xTest.shape[1], xTest.shape[2]])
 xTest = torch.tensor(xTest).float()
 yTest_num = get_handwritten_keys(yTest)
-yTest_num = torch.tensor(yTest_num).long()[:10000]
+yTest_num = torch.tensor(yTest_num).long()
 #  y_validate, x_validate =  get_handwritten_batch(batch_count, int(batch_count*0.9), batch_count)
 
 
-yPred = np.zeros(yTest.shape[0])
+yPred = np.array([])
 model.eval()  # Set this to evaluation mode
 # Loop over xTest and compute labels (implement this)
-yPred = torch.argmax(model(xTest), dim=1).numpy()
+with torch.no_grad():
+    batches = np.split(xTest, xTest.shape[0]//550)
+    for b in batches:
+        yPred_b = torch.argmax(model(b), dim=1).numpy()
+        yPred = np.concatenate((yPred, yPred_b))
 
 # Map it back to numpy to use our functions
 yTest_num = yTest_num.numpy()
@@ -64,4 +68,4 @@ print('Accuracy {:.2f} %\n'.format(acc*100))
 
 
 #Save model
-# torch.save(model.state_dict(), "CNN_Baseline.pt")
+torch.save(model.state_dict(), "CNN_Baseline.pt")

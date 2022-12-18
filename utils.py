@@ -133,6 +133,7 @@ def get_handwritten_batch(batch_count, batch_min, batch_max=None):
             for img_name in img_names:
                 img_path = os.path.join(img_type_path, img_name)
                 _handwritten_paths.append((img_type, img_path))
+        np.random.seed(0)
         np.random.shuffle(_handwritten_paths)
 
     batch_size = len(_handwritten_paths)//batch_count

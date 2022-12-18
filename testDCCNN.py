@@ -76,7 +76,7 @@ yTest_num = get_handwritten_keys(yTest)
 yTest_num = torch.tensor(yTest_num).long()
 
 
-yPred = np.zeros(yTest.shape[0])
+yPred = np.array([])
 model.eval()  # Set this to evaluation mode
 with torch.no_grad():
     batches = np.split(xTest, xTest.shape[0]//800)
