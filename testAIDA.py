@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 def testAIDA():
     images = []
     border_list = []
-    batch = get_aida_batch(1)
+    batch = get_aida_batch(2)
     for i in range(2):
         images.append(next(batch))
 

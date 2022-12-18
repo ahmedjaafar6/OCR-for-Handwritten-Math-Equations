@@ -26,6 +26,7 @@ def get_handwritten_keys(labels=[]):
     global _handwritten_key
     if not _handwritten_key:
         path = os.listdir(_handwritten_path)
+        path = sorted(path)
         _handwritten_key = {label: i for i, label in enumerate(path)}
     return np.array([_handwritten_key[label] for label in labels])
 
