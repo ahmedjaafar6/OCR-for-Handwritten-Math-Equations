@@ -51,7 +51,7 @@ def open_image(path):
     return img
 
 
-def standardize_image(img, invert=False, resize=False, to_gray=False, square=False):
+def standardize_image(img, invert=False, resize=False, to_gray=False, square=False, to_black_and_white=False):
     """Standardize image by converting to grayscale and resizing
 
     Args:
@@ -63,7 +63,12 @@ def standardize_image(img, invert=False, resize=False, to_gray=False, square=Fal
     """
 
     SIZE = (28, 28)
-
+    if to_gray:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.uint8)
+    if invert:
+        img = 255 - img
+    if to_black_and_white:
+        thresh, img = cv2.threshold(img.astype(np.uint8), 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     if square:
         if img.shape[0] > img.shape[1]:
             diff = img.shape[0] - img.shape[1]
@@ -84,10 +89,6 @@ def standardize_image(img, invert=False, resize=False, to_gray=False, square=Fal
                              constant_values=0, mode="constant")
     if resize:
         img = cv2.resize(img, SIZE)
-    if to_gray:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.uint8)
-    if invert:
-        img = 255 - img
     return img
 
 
@@ -143,7 +144,11 @@ def get_handwritten_batch(batch_count, batch_min, batch_max=None):
     images = []
     for img_type, img_path in batch:
         img = open_image(img_path)
-        img = standardize_image(img, invert=True, to_gray=True, resize=True)
+        if 'mnist' in img_path:
+            img = standardize_image(img, to_gray=True, resize=True)
+        else:
+            img = standardize_image(
+                img, invert=True, to_gray=True, resize=True)
         labels.append(img_type)
         images.append(img)
     return np.array(labels), np.array(images)
@@ -226,7 +231,8 @@ def mnist_to_files():
         cv2.imwrite(img_path, img)
 
 
-# if __name__ == '__main__':
-    # mnist_to_files()
-    # get_handwritten_batch(10000, 0)
-    # pass
+if __name__ == '__main__':
+    x = get_handwritten_batch(10000, 0)
+    for i in x:
+        print(i)
+    pass
