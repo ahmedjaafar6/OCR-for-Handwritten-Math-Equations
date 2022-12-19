@@ -1,7 +1,8 @@
 import numpy as np
 import time
 
-from DCCNN import DCCNN
+# from another_CNN import another
+from DCCNN_paper import DCCNN
 from torch import optim
 import torch.nn as nn
 import torch
@@ -18,14 +19,14 @@ model.train()
 # Define loss function and optimizer
 # Implement this
 loss_fun = nn.CrossEntropyLoss()
-optimizer = optim.Adadelta(model.parameters(), lr=0.9, rho=0.95, eps=1e-10)
-# optimizer = optim.Adam(model.parameters(), lr=0.01)
+optimizer = optim.Adadelta(model.parameters(), lr=0.7, rho=0.95, eps=1e-10)
+# optimizer = optim.Adam(model.parameters(), lr=0.0)
 
 
 start = time.time()
 batch_count = 4500
 mini_batch_iter = 10
-for batch_id in range(int(batch_count*0.8)):
+for batch_id in range(int(batch_count*0.8)): # 80% of the data is used for training
     if batch_id % 50 == 0:
         print('Batch_id: {}'.format(batch_id), end='\r')
     labels, images = get_handwritten_batch(batch_count, batch_id)
@@ -55,6 +56,7 @@ yVal_num = torch.tensor(yVal_num).long()
 yPred = np.array([])
 model.eval()  # Set this to evaluation mode
 with torch.no_grad():
+    # yPred = torch.argmax(model(xVal), dim=1).numpy()
     batches = np.split(xVal, xVal.shape[0]//800)
     for b in batches:
         yPred_b = torch.argmax(model(b), dim=1).numpy()
@@ -85,7 +87,7 @@ with torch.no_grad():
         yPred = np.concatenate((yPred, yPred_b))
 
 
-# # Map it back to numpy
+# Map it back to numpy
 yTest_num = yTest_num.numpy()
 (acc, conf) = evaluateLabels(yTest_num, yPred, False)
 print('Testing Accuracy {:.2f} %\n'.format(acc*100))
