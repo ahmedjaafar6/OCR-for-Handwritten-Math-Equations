@@ -1,4 +1,6 @@
-from CNN_Baseline import CNN
+# from CNN_Baseline import CNN
+from DCCNN_best import DCCNN as CNN
+# from DCCNN_paper import DCCNN as CNN
 import torch
 from utils import get_aida_batch, standardize_image, get_handwritten_values
 import numpy as np
@@ -10,13 +12,15 @@ def testAIDA():
     images = []
     border_list = []
     batch = get_aida_batch(1)
-    # for i in range(0,2):
-    next(batch)
+    for i in range(1):
+        next(batch)
     images.append(next(batch))
 
     # Test with AIDA
     model = CNN()
-    model.load_state_dict(torch.load("CNN_Baseline.pt"))
+    # model.load_state_dict(torch.load("CNN_Baseline.pt"))
+    # model.load_state_dict(torch.load("DCCNN.pt"))
+    model.load_state_dict(torch.load("DCCNN_best.pt"))
     model.eval()
 
     img_predictions = []
